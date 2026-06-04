@@ -23,6 +23,9 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Find ZIP file
         run: |
           ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" | head -n 1)
@@ -35,6 +38,7 @@ jobs:
 
       - name: Unzip Android project
         run: |
+          rm -rf extracted
           mkdir extracted
           unzip -q "$ZIP_FILE" -d extracted
           PROJECT_DIR=$(find extracted -name "settings.gradle" -type f -printf '%h\n' | head -n 1)
@@ -45,13 +49,10 @@ jobs:
           echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
           echo "Project found at: $PROJECT_DIR"
 
-      - name: Make Gradle executable
-        run: chmod +x "$PROJECT_DIR/gradlew"
-
       - name: Build APK
         run: |
           cd "$PROJECT_DIR"
-          ./gradlew assembleDebug
+          gradle assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
