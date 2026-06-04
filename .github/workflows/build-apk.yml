@@ -1,7 +1,11 @@
 name: Build Native Android APK from ZIP
 
-on:
+'on':
   workflow_dispatch:
+  push:
+    branches:
+      - main
+      - principal
 
 permissions:
   contents: read
